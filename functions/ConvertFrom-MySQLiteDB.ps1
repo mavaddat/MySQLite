@@ -45,6 +45,8 @@ Function ConvertFrom-MySQLiteDB {
     )
     Begin {
         Write-Verbose "[$((Get-Date).TimeOfDay)] $($MyInvocation.MyCommand)"
+        Write-Verbose "[$((Get-Date).TimeOfDay)] Running under PowerShell version $($PSVersionTable.PSVersion)"
+        Write-Verbose "[$((Get-Date).TimeOfDay)] Detected culture $(Get-Culture)"
     } #begin
 
     Process {
@@ -77,7 +79,7 @@ Function ConvertFrom-MySQLiteDB {
             <#
                 find a mapping table using this priority list
                 1. PropertyMap parameter
-                2. A table called PropertyMap_tablename
+                2. A table called PropertyMap_TableName
 
                 if nothing found then write a default custom object
             #>
@@ -91,7 +93,7 @@ Function ConvertFrom-MySQLiteDB {
                 }
                 "table" {
                     Write-Verbose "[$((Get-Date).TimeOfDay)] Using property table $PropertyTable"
-                    $map = Invoke-MySQLiteQuery -Connection $connection -Query "Select * from $propertytable" -KeepAlive -As Hashtable
+                    $map = Invoke-MySQLiteQuery -Connection $connection -Query "Select * from $PropertyTable" -KeepAlive -As Hashtable
                     if ($typename) {
                         $oTypename = $TypeName
                     }
@@ -110,7 +112,8 @@ Function ConvertFrom-MySQLiteDB {
                 #$global:m = $map
                 #$global:raw = $raw
                 foreach ($item in $raw) {
-                   # $global:it =$item
+                    # used for testing and development
+                    # $global:it =$item
                     $tmpHash = [ordered]@{}
 
                     foreach ($key in $map.keys) {

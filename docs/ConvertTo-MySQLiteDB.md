@@ -14,7 +14,7 @@ Convert or dump PowerShell objects into a SQLite database.
 ## SYNTAX
 
 ```yaml
-ConvertTo-MySQLiteDB -Inputobject <Object[]> [-Path] <String> -TableName <String> [-Primary <String>] [-TypeName <String>] [-Append] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+ConvertTo-MySQLiteDB -InputObject <Object[]> [-Path] <String> -TableName <String> [-Primary <String>] [-TypeName <String>] [-Append] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -34,7 +34,7 @@ For best results, you should select only the properties you need as some propert
 ### Example 1
 
 ```powershell
-PS C:\> $data = Get-CimInstance win32_operatingsystem -ComputerName $computers | Select-Object @{Name="Computername";Expression={$_.CSName}},@{Name="OS";Expression = {$_.caption}},InstallDate,Version,@{Name="IsServer";Expression={ If ($_.caption -match "server") {$True} else {$False}}}
+PS C:\> $data = Get-CimInstance win32_OperatingSystem -ComputerName $computers | Select-Object @{Name="Computername";Expression={$_.CSName}},@{Name="OS";Expression = {$_.caption}},InstallDate,Version,@{Name="IsServer";Expression={ If ($_.caption -match "server") {$True} else {$False}}}
 PS C:\> $data | ConvertTo-MySQLiteDB -Path c:\work\Inventory.db -TableName OS -TypeName myOS -force
 ```
 
@@ -42,14 +42,14 @@ Convert the results of a PowerShell expression into a SQLite database file using
 
 The first property name will be used as the first table column and the primary index so the values from your command need to be unique.
 
-The database can be queried using Invoke-MYSQLiteQuery or dumped out using ConvertFrom-MySQLiteDB.
+The database can be queried using Invoke-MySQLiteQuery or dumped out using ConvertFrom-MySQLiteDB.
 
 NOTE: Storing objects in a database requires serializing nested objects. This is accomplished by converting objects to cliXML and storing that information as an array of bytes in the database. To convert back, the data must be converted to the original clixml string, saved to a temporary file, and then re-imported with `Import-Clixml`. This process is not guaranteed to be 100% error free. The converted object property should be the deserialized version of the original property.
 
 ### Example 2
 
 ```powershell
-PS C:\>  Get-Process  | Where-Object {$_.name -notmatch "^(system|idle)$"} | Select * | ConvertTo-MySQLiteDB -Path d:\temp\allproc.db -TableName Process -TypeName myProcess -Primary ID
+PS C:\> Get-Process  | Where-Object {$_.name --NotMatch "^(system|idle)$"} | Select-Object * | ConvertTo-MySQLiteDB -Path d:\temp\allproc.db -TableName Process -TypeName myProcess -Primary ID
 ```
 
 Create a database from local process information. This example is specifying the primary key. You need to have one unique property to use as the primary key for the database. If you see a constraint error, you most likely need to set a primary key.
@@ -136,6 +136,38 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -InputObject
+
+What object do you want to create? Typically this will be the result of a PowerShell expression or command. It is recommended that you be selective.
+
+```yaml
+Type: Object[]
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Primary
+
+Specify the column name to use as the primary key or index. Otherwise, the first detected property will be used.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -WhatIf
 
 Shows what would happen if the cmdlet runs. The cmdlet is not run.
@@ -160,38 +192,6 @@ Prompts you for confirmation before running the cmdlet.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Inputobject
-
-What object do you want to create? Typically this will be the result of a PowerShell expression or command. It is recommended that you be selective.
-
-```yaml
-Type: Object[]
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -Primary
-
-Specify the column name to use as the primary key or index. Otherwise, the first detected property will be used.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
 
 Required: False
 Position: Named

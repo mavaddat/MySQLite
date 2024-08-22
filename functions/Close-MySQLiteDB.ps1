@@ -7,7 +7,7 @@ Function Close-MySQLiteDB {
         [Parameter(
             Mandatory,
             HelpMessage = "Enter a connection object",
-        ValueFromPipeline
+            ValueFromPipeline
         )]
         [ValidateNotNullOrEmpty()]
         [System.Data.SQLite.SQLiteConnection]$Connection,
@@ -15,6 +15,8 @@ Function Close-MySQLiteDB {
     )
     Begin {
         Write-Verbose "[$((Get-Date).TimeOfDay)] $($MyInvocation.MyCommand)"
+        Write-Verbose "[$((Get-Date).TimeOfDay)] Running under PowerShell version $($PSVersionTable.PSVersion)"
+        Write-Verbose "[$((Get-Date).TimeOfDay)] Detected culture $(Get-Culture)"
     } #begin
 
     Process {
@@ -27,7 +29,6 @@ Function Close-MySQLiteDB {
 
             $connection.Dispose()
         }
-
     } #process
 
     End {
